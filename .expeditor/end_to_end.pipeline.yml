@@ -1389,3 +1389,5 @@ steps:
       executor:
         docker:
           privileged: true
+          environment:
+            - JOB_HAB_BLDR_URL=https://bldr.acceptance.habitat.sh
