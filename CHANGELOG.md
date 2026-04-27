@@ -1,16 +1,18 @@
 # Habitat CHANGELOG
 
-<!-- latest_release 2.0.526 -->
-## [2.0.526](https://github.com/habitat-sh/habitat/tree/2.0.526) (2026-04-27)
+<!-- latest_release 2.0.527 -->
+## [2.0.527](https://github.com/habitat-sh/habitat/tree/2.0.527) (2026-04-27)
 
 #### Merged Pull Requests
-- set JOB_HAB_BLDR_URL in e2e promotion [#10367](https://github.com/habitat-sh/habitat/pull/10367) ([mwrock](https://github.com/mwrock))
+- Bump rustls-pki-types from 1.14.0 to 1.14.1 [#10366](https://github.com/habitat-sh/habitat/pull/10366) ([dependabot[bot]](https://github.com/dependabot[bot]))
 <!-- latest_release -->
 
 <!-- release_rollup since=2.0.504-->
 ### Changes since 2.0.504 release
 
 #### Merged Pull Requests
+- Bump rustls-pki-types from 1.14.0 to 1.14.1 [#10366](https://github.com/habitat-sh/habitat/pull/10366) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.0.527 -->
+- Bump cc from 1.2.60 to 1.2.61 [#10365](https://github.com/habitat-sh/habitat/pull/10365) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.0.527 -->
 - set JOB_HAB_BLDR_URL in e2e promotion [#10367](https://github.com/habitat-sh/habitat/pull/10367) ([mwrock](https://github.com/mwrock)) <!-- 2.0.526 -->
 - bump rand 0.9.2 to 0.9.4 [#10364](https://github.com/habitat-sh/habitat/pull/10364) ([mwrock](https://github.com/mwrock)) <!-- 2.0.525 -->
 - Bump libc from 0.2.185 to 0.2.186 [#10362](https://github.com/habitat-sh/habitat/pull/10362) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.0.524 -->
