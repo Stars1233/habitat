@@ -33,7 +33,8 @@ use habitat_core::{AUTH_TOKEN_ENVVAR,
                          DEFAULT_BLDR_URL,
                          bldr_url_from_env}};
 
-use crate::REFRESH_CHANNEL_ENVVAR;
+use crate::{REFRESH_CHANNEL_ENVVAR,
+            SECRET_REFRESH_CHANNEL_ENVVAR};
 
 use hab_common_derive::GenConfig;
 
@@ -687,7 +688,9 @@ pub(crate) fn refresh_channel_from_args_env_or_config(opt: Option<String>)
         match hcore_env::var(REFRESH_CHANNEL_ENVVAR) {
             Ok(v) => Ok(v),
             Err(_) => {
-                CliConfig::load()?.refresh_channel.ok_or_else(|| {
+                match hcore_env::var(SECRET_REFRESH_CHANNEL_ENVVAR) {
+                    Ok(v) => Ok(v),
+                    Err(_) => CliConfig::load()?.refresh_channel.ok_or_else(|| {
                                                        Error::ArgumentError("No refresh channel \
                                                                              specified. Please \
                                                                              specify with \
@@ -696,6 +699,7 @@ pub(crate) fn refresh_channel_from_args_env_or_config(opt: Option<String>)
                                                                              add refresh_channel to ~/.hab/etc/cli.toml"
                                                                                              .into())
                                                    })
+                }
             }
         }
     }
@@ -725,10 +729,14 @@ pub(crate) async fn process_sup_request(remote_sup: &ResolvedListenCtlAddr,
             "NetOk" => (),
             "NetErr" => {
                 let m = reply.parse::<habitat_sup_protocol::net::NetErr>()
-                            .map_err(SrvClientError::Decode)?;
+                             .map_err(SrvClientError::Decode)?;
                 return Err(SrvClientError::from(m).into());
             }
-            _ => return Err(SrvClientError::from(io::Error::from(io::ErrorKind::UnexpectedEof)).into()),
+            _ => {
+                return Err(
+                    SrvClientError::from(io::Error::from(io::ErrorKind::UnexpectedEof)).into(),
+                );
+            }
         }
     }
     Ok(())
