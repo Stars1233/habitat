@@ -20,11 +20,12 @@ const HAB_PLAN_BUILD_SOURCE_FILES: [(&str, &[u8]); 4] =
      ("hab-plan-build.sh", include_bytes!("../../../../plan-build/bin/hab-plan-build-linux.sh"))];
 
 #[cfg(target_os = "macos")]
-const HAB_PLAN_BUILD_SOURCE_FILES: [(&str, &[u8]); 5] =
+const HAB_PLAN_BUILD_SOURCE_FILES: [(&str, &[u8]); 6] =
     [("environment.bash", include_bytes!("../../../../plan-build/bin/environment.bash")),
      ("shared.bash", include_bytes!("../../../../plan-build/bin/shared.bash")),
      ("public.bash", include_bytes!("../../../../plan-build/bin/public.bash")),
      ("hab-plan-build.sh", include_bytes!("../../../../plan-build/bin/hab-plan-build-darwin.sh")),
+     ("internal.sh", include_bytes!("../../../../plan-build/bin/internal.sh")),
      ("hab-plan-build-darwin-internal.bash",
       include_bytes!("../../../../plan-build/bin/hab-plan-build-darwin-internal.bash"))];
 

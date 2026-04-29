@@ -179,15 +179,8 @@ mod inner {
 
     pub async fn start(ui: &mut UI, args: &[OsString]) -> Result<()> {
         if is_native_studio(args) {
-            if cfg!(target_os = "linux") {
-                rerun_with_sudo_if_needed(ui, args, true)?;
-                native::start_native_studio(ui, args)
-            } else {
-                log::error!("Native Studio not supported for this Platform.");
-                return Err(Error::ArgumentError("Native Studio not supported for \
-                                                 macOS."
-                                                        .to_string()));
-            }
+            rerun_with_sudo_if_needed(ui, args, true)?;
+            native::start_native_studio(ui, args)
         } else {
             rerun_with_sudo_if_needed(ui, args, false)?;
             if is_docker_studio(args) {
