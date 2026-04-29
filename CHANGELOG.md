@@ -1,16 +1,17 @@
 # Habitat CHANGELOG
 
-<!-- latest_release 2.0.530 -->
-## [2.0.530](https://github.com/habitat-sh/habitat/tree/2.0.530) (2026-04-28)
+<!-- latest_release 2.0.531 -->
+## [2.0.531](https://github.com/habitat-sh/habitat/tree/2.0.531) (2026-04-29)
 
 #### Merged Pull Requests
-- Bump reqwest from 0.13.2 to 0.13.3 [#10368](https://github.com/habitat-sh/habitat/pull/10368) ([dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump rustls from 0.23.39 to 0.23.40 [#10371](https://github.com/habitat-sh/habitat/pull/10371) ([dependabot[bot]](https://github.com/dependabot[bot]))
 <!-- latest_release -->
 
 <!-- release_rollup since=2.0.504-->
 ### Changes since 2.0.504 release
 
 #### Merged Pull Requests
+- Bump rustls from 0.23.39 to 0.23.40 [#10371](https://github.com/habitat-sh/habitat/pull/10371) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.0.531 -->
 - Bump reqwest from 0.13.2 to 0.13.3 [#10368](https://github.com/habitat-sh/habitat/pull/10368) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.0.530 -->
 - Bump clap_complete from 4.6.2 to 4.6.3 [#10369](https://github.com/habitat-sh/habitat/pull/10369) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.0.529 -->
 - Bump openssl from 0.10.75 to 0.10.78 [#10358](https://github.com/habitat-sh/habitat/pull/10358) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.0.528 -->
