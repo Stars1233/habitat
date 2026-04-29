@@ -65,22 +65,49 @@ pub fn start_docker_studio(_ui: &mut UI, args: &[OsString]) -> Result<()> {
                                                local_cache_key_path.display())));
     }
 
-    let mut volumes = vec![format!("{}:{}{}",
-                                   env::current_dir().unwrap().to_string_lossy(),
-                                   mnt_prefix,
-                                   "/src"),
-                           format!("{}:{}/{}",
-                                   local_cache_key_path.display(),
-                                   mnt_prefix,
-                                   CACHE_KEY_PATH_POSTFIX),];
-    if let Ok(cache_artifact_path) = henv::var(ARTIFACT_PATH_ENVVAR) {
-        // Don't use Path::join here as "\" can cause problems in Docker mounts
+    let mut volumes = vec![];
+
+    volumes.push(format!("{}:{}{}",
+                         env::current_dir().unwrap().to_string_lossy(),
+                         mnt_prefix,
+                         "/src"));
+    if !cfg!(target_os = "macos") {
         volumes.push(format!("{}:{}/{}",
-                             cache_artifact_path, mnt_prefix, CACHE_ARTIFACT_PATH));
-    }
-    if let Ok(cache_ssl_path) = henv::var(CERT_PATH_ENVVAR) {
-        // Don't use Path::join here as "\" can cause problems in Docker mounts
-        volumes.push(format!("{}:{}/{}", cache_ssl_path, mnt_prefix, CACHE_SSL_PATH));
+                             local_cache_key_path.display(),
+                             mnt_prefix,
+                             CACHE_KEY_PATH_POSTFIX));
+
+        if let Ok(cache_artifact_path) = henv::var(ARTIFACT_PATH_ENVVAR) {
+            // Don't use Path::join here as "\" can cause problems in Docker mounts
+            volumes.push(format!("{}:{}/{}",
+                                 cache_artifact_path, mnt_prefix, CACHE_ARTIFACT_PATH));
+        }
+
+        if let Ok(cache_ssl_path) = henv::var(CERT_PATH_ENVVAR) {
+            // Don't use Path::join here as "\" can cause problems in Docker mounts
+            volumes.push(format!("{}:{}/{}", cache_ssl_path, mnt_prefix, CACHE_SSL_PATH));
+        }
+    } else {
+        volumes.push(format!("{}:{}/{}",
+                             local_cache_key_path.display(),
+                             mnt_prefix,
+                             CACHE_KEY_PATH_POSTFIX.strip_prefix("opt/").unwrap()));
+
+        if let Ok(cache_artifact_path) = henv::var(ARTIFACT_PATH_ENVVAR) {
+            // Don't use Path::join here as "\" can cause problems in Docker mounts
+            volumes.push(format!("{}:{}/{}",
+                                 cache_artifact_path,
+                                 mnt_prefix,
+                                 CACHE_ARTIFACT_PATH.strip_prefix("opt/").unwrap()));
+        }
+
+        if let Ok(cache_ssl_path) = henv::var(CERT_PATH_ENVVAR) {
+            // Don't use Path::join here as "\" can cause problems in Docker mounts
+            volumes.push(format!("{}:{}/{}",
+                                 cache_ssl_path,
+                                 mnt_prefix,
+                                 CACHE_SSL_PATH.strip_prefix("opt/").unwrap()));
+        }
     }
     if !using_windows_containers
        && (Path::new(DOCKER_SOCKET).exists() || cfg!(target_os = "windows"))
