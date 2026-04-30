@@ -1,16 +1,17 @@
 # Habitat CHANGELOG
 
-<!-- latest_release 2.0.533 -->
-## [2.0.533](https://github.com/habitat-sh/habitat/tree/2.0.533) (2026-04-30)
+<!-- latest_release 2.0.534 -->
+## [2.0.534](https://github.com/habitat-sh/habitat/tree/2.0.534) (2026-04-30)
 
 #### Merged Pull Requests
-- fix docker studio invocation on `HAB_STUDIO_SECRET_HAB_REFRESH_CHANNEL` [#10370](https://github.com/habitat-sh/habitat/pull/10370) ([agadgil-progress](https://github.com/agadgil-progress))
+- macOS Studio handling [#10372](https://github.com/habitat-sh/habitat/pull/10372) ([agadgil-progress](https://github.com/agadgil-progress))
 <!-- latest_release -->
 
 <!-- release_rollup since=2.0.504-->
 ### Changes since 2.0.504 release
 
 #### Merged Pull Requests
+- macOS Studio handling [#10372](https://github.com/habitat-sh/habitat/pull/10372) ([agadgil-progress](https://github.com/agadgil-progress)) <!-- 2.0.534 -->
 - fix docker studio invocation on `HAB_STUDIO_SECRET_HAB_REFRESH_CHANNEL` [#10370](https://github.com/habitat-sh/habitat/pull/10370) ([agadgil-progress](https://github.com/agadgil-progress)) <!-- 2.0.533 -->
 - add aarch64-windows as a viable target [#10373](https://github.com/habitat-sh/habitat/pull/10373) ([mwrock](https://github.com/mwrock)) <!-- 2.0.532 -->
 - Bump rustls from 0.23.39 to 0.23.40 [#10371](https://github.com/habitat-sh/habitat/pull/10371) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 2.0.531 -->
