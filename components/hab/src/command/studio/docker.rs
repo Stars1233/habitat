@@ -65,22 +65,55 @@ pub fn start_docker_studio(_ui: &mut UI, args: &[OsString]) -> Result<()> {
                                                local_cache_key_path.display())));
     }
 
-    let mut volumes = vec![format!("{}:{}{}",
-                                   env::current_dir().unwrap().to_string_lossy(),
-                                   mnt_prefix,
-                                   "/src"),
-                           format!("{}:{}/{}",
-                                   local_cache_key_path.display(),
-                                   mnt_prefix,
-                                   CACHE_KEY_PATH_POSTFIX),];
-    if let Ok(cache_artifact_path) = henv::var(ARTIFACT_PATH_ENVVAR) {
-        // Don't use Path::join here as "\" can cause problems in Docker mounts
+    let mut volumes = vec![];
+
+    volumes.push(format!("{}:{}{}",
+                         env::current_dir().unwrap().to_string_lossy(),
+                         mnt_prefix,
+                         "/src"));
+    if !cfg!(target_os = "macos") {
         volumes.push(format!("{}:{}/{}",
-                             cache_artifact_path, mnt_prefix, CACHE_ARTIFACT_PATH));
-    }
-    if let Ok(cache_ssl_path) = henv::var(CERT_PATH_ENVVAR) {
-        // Don't use Path::join here as "\" can cause problems in Docker mounts
-        volumes.push(format!("{}:{}/{}", cache_ssl_path, mnt_prefix, CACHE_SSL_PATH));
+                             local_cache_key_path.display(),
+                             mnt_prefix,
+                             CACHE_KEY_PATH_POSTFIX));
+
+        if let Ok(cache_artifact_path) = henv::var(ARTIFACT_PATH_ENVVAR) {
+            // Don't use Path::join here as "\" can cause problems in Docker mounts
+            volumes.push(format!("{}:{}/{}",
+                                 cache_artifact_path, mnt_prefix, CACHE_ARTIFACT_PATH));
+        }
+
+        if let Ok(cache_ssl_path) = henv::var(CERT_PATH_ENVVAR) {
+            // Don't use Path::join here as "\" can cause problems in Docker mounts
+            volumes.push(format!("{}:{}/{}", cache_ssl_path, mnt_prefix, CACHE_SSL_PATH));
+        }
+    } else {
+        volumes.push(format!("{}:{}/{}",
+                             local_cache_key_path.display(),
+                             mnt_prefix,
+                             CACHE_KEY_PATH_POSTFIX.strip_prefix("opt/")
+                                                   .expect("key cache path not starting with \
+                                                            'opt/' on macOS.")));
+
+        if let Ok(cache_artifact_path) = henv::var(ARTIFACT_PATH_ENVVAR) {
+            // Don't use Path::join here as "\" can cause problems in Docker mounts
+            volumes.push(format!("{}:{}/{}",
+                                 cache_artifact_path,
+                                 mnt_prefix,
+                                 CACHE_ARTIFACT_PATH.strip_prefix("opt/")
+                                                    .expect("artifact cache path not starting \
+                                                             with 'opt/' on macOS.")));
+        }
+
+        if let Ok(cache_ssl_path) = henv::var(CERT_PATH_ENVVAR) {
+            // Don't use Path::join here as "\" can cause problems in Docker mounts
+            volumes.push(format!("{}:{}/{}",
+                                 cache_ssl_path,
+                                 mnt_prefix,
+                                 CACHE_SSL_PATH.strip_prefix("opt/")
+                                               .expect("ssl cache path not starting with \
+                                                        'opt/' on macOS.")));
+        }
     }
     if !using_windows_containers
        && (Path::new(DOCKER_SOCKET).exists() || cfg!(target_os = "windows"))
@@ -157,9 +190,15 @@ fn update_ssl_cert_file_envvar(mnt_prefix: &str) {
                 // Don't use Path::join here in order to work around platform
                 // differences with paths on Windows with linux containers enabled
                 // TODO: Audit that the environment access only happens in single-threaded code.
+                let cache_ssl_path = if cfg!(target_os = "macos") {
+                    CACHE_SSL_PATH.strip_prefix("opt/")
+                                  .expect("ssl cache path not starting with 'opt/' on macOS")
+                } else {
+                    CACHE_SSL_PATH
+                };
                 unsafe {
                     env::set_var(SSL_CERT_FILE_ENVVAR,
-                                 format!("{}/{}/{}", mnt_prefix, CACHE_SSL_PATH, cert_file_name))
+                                 format!("{}/{}/{}", mnt_prefix, cache_ssl_path, cert_file_name))
                 };
             } else {
                 warn!("Unable to format {:?} for use inside studio", ssl_cert_file);
@@ -452,7 +491,11 @@ mod tests {
         // Don't use Path::join here because we format! the path above,
         // in order to work around platform differences with paths on
         // windows with linux containers enabled
-        let internal_cert_path = format!("{}/{}/{}", mnt_prefix, CACHE_SSL_PATH, key_name);
+        let internal_cert_path = format!("{}/{}/{}",
+                                         mnt_prefix,
+                                         CACHE_SSL_PATH.strip_prefix("opt/")
+                                                       .unwrap_or(CACHE_SSL_PATH),
+                                         key_name);
 
         assert_eq!(std::env::var(SSL_CERT_FILE_ENVVAR), Ok(internal_cert_path));
     }
