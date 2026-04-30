@@ -27,6 +27,7 @@ pub const VERSION: &str = include_str!(concat!(env!("OUT_DIR"), "/VERSION"));
 pub const ORIGIN_ENVVAR: &str = "HAB_ORIGIN";
 pub const BLDR_URL_ENVVAR: &str = "HAB_BLDR_URL";
 pub const REFRESH_CHANNEL_ENVVAR: &str = "HAB_REFRESH_CHANNEL";
+pub const SECRET_REFRESH_CHANNEL_ENVVAR: &str = "HAB_STUDIO_SECRET_HAB_REFRESH_CHANNEL";
 
 pub use crate::hcore::AUTH_TOKEN_ENVVAR;
 

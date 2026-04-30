@@ -33,7 +33,8 @@ use habitat_core::{AUTH_TOKEN_ENVVAR,
                          DEFAULT_BLDR_URL,
                          bldr_url_from_env}};
 
-use crate::REFRESH_CHANNEL_ENVVAR;
+use crate::{REFRESH_CHANNEL_ENVVAR,
+            SECRET_REFRESH_CHANNEL_ENVVAR};
 
 use hab_common_derive::GenConfig;
 
@@ -687,7 +688,9 @@ pub(crate) fn refresh_channel_from_args_env_or_config(opt: Option<String>)
         match hcore_env::var(REFRESH_CHANNEL_ENVVAR) {
             Ok(v) => Ok(v),
             Err(_) => {
-                CliConfig::load()?.refresh_channel.ok_or_else(|| {
+                match hcore_env::var(SECRET_REFRESH_CHANNEL_ENVVAR) {
+                    Ok(v) => Ok(v),
+                    Err(_) => CliConfig::load()?.refresh_channel.ok_or_else(|| {
                                                        Error::ArgumentError("No refresh channel \
                                                                              specified. Please \
                                                                              specify with \
@@ -696,6 +699,7 @@ pub(crate) fn refresh_channel_from_args_env_or_config(opt: Option<String>)
                                                                              add refresh_channel to ~/.hab/etc/cli.toml"
                                                                                              .into())
                                                    })
+                }
             }
         }
     }
@@ -725,10 +729,14 @@ pub(crate) async fn process_sup_request(remote_sup: &ResolvedListenCtlAddr,
             "NetOk" => (),
             "NetErr" => {
                 let m = reply.parse::<habitat_sup_protocol::net::NetErr>()
-                            .map_err(SrvClientError::Decode)?;
+                             .map_err(SrvClientError::Decode)?;
                 return Err(SrvClientError::from(m).into());
             }
-            _ => return Err(SrvClientError::from(io::Error::from(io::ErrorKind::UnexpectedEof)).into()),
+            _ => {
+                return Err(
+                    SrvClientError::from(io::Error::from(io::ErrorKind::UnexpectedEof)).into(),
+                );
+            }
         }
     }
     Ok(())
@@ -956,6 +964,34 @@ mod tests {
             let result =
                 maybe_refresh_channel_from_args_env_or_config(Some("cli_channel".to_string()));
             assert_eq!(result, Some("cli_channel".to_string()));
+        }
+
+        #[test]
+        fn test_no_arg_no_env_defaults_to_base_channel() {
+            let env_var = locked_refresh_channel();
+            env_var.unset();
+
+            // No CLI arg and no env var → None; pkg build falls back to ChannelIdent::default()
+            let result = maybe_refresh_channel_from_args_env_or_config(None);
+            let channel = result.unwrap_or_else(|| ChannelIdent::default().to_string());
+            assert_eq!(channel, ChannelIdent::default().to_string());
+        }
+    }
+
+    mod secret_refresh_channel_tests {
+        use crate::cli_v4::utils::maybe_refresh_channel_from_args_env_or_config;
+        use habitat_core::ChannelIdent;
+
+        habitat_core::locked_env_var!(HAB_STUDIO_SECRET_HAB_REFRESH_CHANNEL,
+                                      locked_refresh_channel);
+
+        #[test]
+        fn test_refresh_channel_from_env() {
+            let env_var = locked_refresh_channel();
+            env_var.set("staging");
+
+            let result = maybe_refresh_channel_from_args_env_or_config(None);
+            assert_eq!(result, Some("staging".to_string()));
         }
 
         #[test]
